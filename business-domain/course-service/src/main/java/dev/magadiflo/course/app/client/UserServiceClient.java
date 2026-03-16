@@ -1,4 +1,4 @@
-package dev.magadiflo.course.app;
+package dev.magadiflo.course.app.client;
 
 import dev.magadiflo.course.app.dto.UserRequest;
 import dev.magadiflo.course.app.dto.UserResponse;

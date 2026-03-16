@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +54,81 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
+
+    /**
+     * Manejo de usuario inexistente en el servicio remoto.
+     * Se dispara cuando el user-service devuelve un 404 explícito.
+     */
+    @ExceptionHandler(RemoteUserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRemoteUserNotFoundException(RemoteUserNotFoundException ex, HttpServletRequest request) {
+        log.error("Usuario no encontrado en el [user-service]: {}", ex.getMessage());
+        var errorResponse = this.buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorResponse);
+    }
+
+    /**
+     * Manejo de errores de lógica o negocio remotos.
+     * Envuelve los fallos controlados que el user-service nos notifica.
+     */
+    @ExceptionHandler(CommunicationException.class)
+    public ResponseEntity<ErrorResponse> handleCommunicationException(CommunicationException ex, HttpServletRequest request) {
+        log.error("Error en la comunicación con el [user-service]: {}", ex.getMessage());
+        var errorResponse = this.buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(errorResponse);
+    }
+
+    /**
+     * Manejo de respuestas HTTP de error (4xx y 5xx) del RestClient.
+     * Mapeado como BAD_GATEWAY para indicar que un servidor intermedio falló.
+     */
+    @ExceptionHandler(value = {
+            HttpClientErrorException.class, // (errores HTTP 4xx)
+            HttpServerErrorException.class  // (errores HTTP 5xx)
+    })
+    public ResponseEntity<ErrorResponse> handleRestClientResponseException(RestClientResponseException ex, HttpServletRequest request) {
+        log.warn("Error del servicio remoto [user-service] - status: {} - body: {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+        var errorResponse = this.buildErrorResponse(
+                HttpStatus.BAD_GATEWAY,
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(errorResponse);
+    }
+
+    /**
+     * Manejo de fallos críticos de conectividad.
+     * Captura caídas del servicio, timeouts o errores de resolución de DNS.
+     */
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<ErrorResponse> handleRestClientException(RestClientException ex, HttpServletRequest request) {
+        log.error("Fallo de red o fallo del tiempo de espera al comunicarse con el servicio remoto [user-service]", ex);
+        var errorResponse = this.buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "No se pudo comunicar con el servicio remoto. " + ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(errorResponse);
     }
 
