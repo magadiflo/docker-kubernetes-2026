@@ -76,24 +76,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Manejo de errores de lógica o negocio remotos.
-     * Envuelve los fallos controlados que el user-service nos notifica.
-     */
-    @ExceptionHandler(CommunicationException.class)
-    public ResponseEntity<ErrorResponse> handleCommunicationException(CommunicationException ex, HttpServletRequest request) {
-        log.error("Error en la comunicación con el [user-service]: {}", ex.getMessage());
-        var errorResponse = this.buildErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(errorResponse);
-    }
-
-    /**
      * Manejo de respuestas HTTP de error (4xx y 5xx) del RestClient.
      * Mapeado como BAD_GATEWAY para indicar que un servidor intermedio falló.
      */
