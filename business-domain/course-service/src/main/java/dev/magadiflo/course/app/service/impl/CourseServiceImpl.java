@@ -33,17 +33,18 @@ public class CourseServiceImpl implements CourseService {
 
     // --- 🔍 Operaciones de Consulta ---
     @Override
-    public List<CourseResponse> findAllCourses() {
-        return this.courseRepository.findAll()
-                .stream()
-                .map(this.courseMapper::toCourseResponse)
-                .toList();
+    public List<CourseResponse> findAllCourses(boolean loadRelations) {
+        return loadRelations ?
+                this.courseRepository.findAll().stream().map(this::loadRelations).toList() :
+                this.courseRepository.findAll().stream().map(this.courseMapper::toCourseResponse).toList();
     }
 
     @Override
-    public CourseResponse findCourse(Long courseId) {
+    public CourseResponse findCourse(Long courseId, boolean loadRelations) {
         Course course = this.findCourseOrThrow(courseId);
-        return this.courseMapper.toCourseResponse(course);
+        return loadRelations ?
+                this.loadRelations(course) :
+                this.courseMapper.toCourseResponse(course);
     }
 
     // --- 💾 Operaciones de Persistencia Local ---
@@ -123,6 +124,22 @@ public class CourseServiceImpl implements CourseService {
 
         this.courseRepository.save(course);
         return userResponse;
+    }
+
+    /**
+     * Proceso de Hidratación: Transforma una entidad local en una respuesta enriquecida.
+     * 1. Extrae los IDs de usuario de la base de datos local.
+     * 2. Si hay IDs, solicita los detalles al user-service.
+     * 3. Retorna el DTO CourseResponse con la lista de usuarios.
+     */
+    private CourseResponse loadRelations(Course course) {
+        List<Long> usersIds = this.extractUserIdsFromCourse(course).stream().toList();
+
+        List<UserResponse> userResponseList = usersIds.isEmpty()
+                ? List.of()
+                : this.userServiceClient.getUsersFromUserService(usersIds);
+
+        return new CourseResponse(course.getId(), course.getName(), userResponseList);
     }
 
     /**

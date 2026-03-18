@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -32,13 +33,14 @@ public class CourseController {
     private final CourseUserService courseUserService;
 
     @GetMapping
-    public ResponseEntity<List<CourseResponse>> findAllCourses() {
-        return ResponseEntity.ok(this.courseService.findAllCourses());
+    public ResponseEntity<List<CourseResponse>> findAllCourses(@RequestParam(required = false, defaultValue = "false") boolean loadRelations) {
+        return ResponseEntity.ok(this.courseService.findAllCourses(loadRelations));
     }
 
     @GetMapping(path = "/{courseId}")
-    public ResponseEntity<CourseResponse> findCourse(@PathVariable Long courseId) {
-        return ResponseEntity.ok(this.courseService.findCourse(courseId));
+    public ResponseEntity<CourseResponse> findCourse(@PathVariable Long courseId,
+                                                     @RequestParam(required = false, defaultValue = "false") boolean loadRelations) {
+        return ResponseEntity.ok(this.courseService.findCourse(courseId, loadRelations));
     }
 
     @PostMapping
@@ -95,7 +97,7 @@ public class CourseController {
     // --- 🧹 Comunicación: [course-service] ← [user-service] ---
 
     /**
-     * 🗑️ Endpoint de limpieza: Elimina la presencia de un usuario en todo el sistema de cursos.
+     * 🗑️ Endpoint de limpieza: Elimina la presencia de un usuario en tod0 el sistema de cursos.
      * Invocado por el user-service antes de una eliminación definitiva.
      */
     @DeleteMapping(path = "/users/{userId}")

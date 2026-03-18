@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -102,6 +103,7 @@ public class UserServiceClient {
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
                 });
+        users = Objects.nonNull(users)  ? users : List.of();
 
         log.info("Recuperación exitosa de usuarios en [user-service]: {}", users);
         return users;
