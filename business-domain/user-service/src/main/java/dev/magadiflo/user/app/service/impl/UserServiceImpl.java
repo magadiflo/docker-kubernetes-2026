@@ -72,4 +72,22 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
         this.userRepository.delete(foundUser);
     }
+
+    //-- 🌐 Para la comunicación desde el course-service ---
+
+    /**
+     * Recupera un listado de usuarios a partir de una colección de identificadores.
+     * <p>
+     * Se utiliza findAllById para ejecutar una única consulta SQL optimizada.
+     *
+     * @param userIds Lista de identificadores únicos.
+     * @return Lista de UserResponse con la información detallada de cada usuario encontrado.
+     */
+    @Override
+    public List<UserResponse> findUsersByIds(List<Long> userIds) {
+        return this.userRepository.findAllById(userIds)
+                .stream()
+                .map(this.userMapper::toUserResponse)
+                .toList();
+    }
 }

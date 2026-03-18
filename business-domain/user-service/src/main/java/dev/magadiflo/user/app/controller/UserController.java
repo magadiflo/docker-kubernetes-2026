@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -55,5 +56,17 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         this.userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    //-- 🌐 Para la comunicación desde el course-service ---
+
+    /**
+     * Endpoint para la recuperación masiva de usuarios.
+     *
+     * @param userIds Lista de IDs enviados como parámetros en la URL (ej: ?userIds=1,2,3).
+     */
+    @GetMapping(path = "/by-ids")
+    public ResponseEntity<List<UserResponse>> findUsersByUserIds(@RequestParam List<Long> userIds) {
+        return ResponseEntity.ok(this.userService.findUsersByIds(userIds));
     }
 }

@@ -15,4 +15,7 @@ public interface UserService {
     UserResponse updateUser(Long userId, UserRequest userRequest);
 
     void deleteUser(Long userId);
+
+    //-- 🌐 Para la comunicación desde el course-service ---
+    List<UserResponse> findUsersByIds(List<Long> userIds);
 }
