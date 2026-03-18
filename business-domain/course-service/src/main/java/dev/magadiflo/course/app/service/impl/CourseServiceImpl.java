@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -122,5 +123,21 @@ public class CourseServiceImpl implements CourseService {
 
         this.courseRepository.save(course);
         return userResponse;
+    }
+
+    /**
+     * Extrae los identificadores únicos de usuario asociados a un curso específico.
+     * <p>
+     * Este método mapea la colección de entidades de relación local (CourseUser)
+     * a una colección de IDs nativos, facilitando la consulta masiva hacia el user-service.
+     *
+     * @param course Entidad del curso que contiene la lista de usuarios asociados.
+     * @return Collection<Long> Conjunto de IDs de usuario listos para la hidratación remota.
+     */
+    private Collection<Long> extractUserIdsFromCourse(Course course) {
+        return course.getCourseUsers()
+                .stream()
+                .map(CourseUser::getUserId)
+                .toList();
     }
 }
