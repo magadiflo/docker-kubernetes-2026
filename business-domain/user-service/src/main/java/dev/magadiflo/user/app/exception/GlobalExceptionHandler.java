@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +68,45 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
+
+    /**
+     * Manejo de respuestas HTTP de error (4xx y 5xx) del RestClient.
+     * Mapeado como BAD_GATEWAY para indicar que un servidor intermedio falló.
+     */
+    @ExceptionHandler(value = {
+            HttpClientErrorException.class, // (errores HTTP 4xx)
+            HttpServerErrorException.class  // (errores HTTP 5xx)
+    })
+    public ResponseEntity<ErrorResponse> handleRestClientResponseException(RestClientResponseException ex, HttpServletRequest request) {
+        log.warn("Error del servicio remoto [course-service] - status: {} - body: {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+        var errorResponse = this.buildErrorResponse(
+                HttpStatus.BAD_GATEWAY,
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(errorResponse);
+    }
+
+    /**
+     * Manejo de fallos críticos de conectividad.
+     * Captura caídas del servicio, timeouts o errores de resolución de DNS.
+     */
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<ErrorResponse> handleRestClientException(RestClientException ex, HttpServletRequest request) {
+        log.error("Fallo de red o fallo del tiempo de espera al comunicarse con el servicio remoto [course-service]", ex);
+        var errorResponse = this.buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "No se pudo comunicar con el servicio remoto. " + ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(errorResponse);
     }
 
