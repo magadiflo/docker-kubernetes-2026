@@ -5,10 +5,13 @@ import dev.magadiflo.course.app.dto.UserResponse;
 import dev.magadiflo.course.app.exception.RemoteUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -76,5 +79,31 @@ public class UserServiceClient {
 
         log.info("Usuario registrado con éxito en el [user-service]: {}", userResponse);
         return userResponse;
+    }
+
+    /**
+     * Recupera una colección de usuarios del servicio remoto mediante una lista de IDs.
+     * <p>
+     * Se utiliza ParameterizedTypeReference para capturar la información de tipo
+     * genérico (List<UserResponse>) durante la deserialización del cuerpo de la respuesta.
+     *
+     * @param userIds Lista de identificadores únicos de usuario.
+     * @return Lista de objetos UserResponse con la información detallada.
+     */
+    public List<UserResponse> getUsersFromUserService(List<Long> userIds) {
+        log.info("Iniciando recuperación masiva en [user-service] para IDs: {}", userIds);
+
+        List<UserResponse> users = this.restClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/by-ids")
+                        .queryParam("userIds", userIds)
+                        .build())
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+
+        log.info("Recuperación exitosa de usuarios en [user-service]: {}", users);
+        return users;
     }
 }
