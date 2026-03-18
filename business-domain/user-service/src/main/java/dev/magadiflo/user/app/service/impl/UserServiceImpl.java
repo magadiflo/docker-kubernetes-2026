@@ -1,5 +1,6 @@
 package dev.magadiflo.user.app.service.impl;
 
+import dev.magadiflo.user.app.client.CourseServiceClient;
 import dev.magadiflo.user.app.dto.UserRequest;
 import dev.magadiflo.user.app.dto.UserResponse;
 import dev.magadiflo.user.app.entity.User;
@@ -19,6 +20,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
+    private final CourseServiceClient courseServiceClient;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -68,8 +70,32 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long userId) {
+        // 1. Verificación de existencia
         User foundUser = this.userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+
+        // 2. Persistencia local
         this.userRepository.delete(foundUser);
+
+        // 3. Orquestación distribuida (Limpieza de cursos)
+        this.courseServiceClient.unassignUserFromAssociatedCourse(userId);
+    }
+
+    //-- 🌐 Para la comunicación desde el course-service ---
+
+    /**
+     * Recupera un listado de usuarios a partir de una colección de identificadores.
+     * <p>
+     * Se utiliza findAllById para ejecutar una única consulta SQL optimizada.
+     *
+     * @param userIds Lista de identificadores únicos.
+     * @return Lista de UserResponse con la información detallada de cada usuario encontrado.
+     */
+    @Override
+    public List<UserResponse> findUsersByIds(List<Long> userIds) {
+        return this.userRepository.findAllById(userIds)
+                .stream()
+                .map(this.userMapper::toUserResponse)
+                .toList();
     }
 }
