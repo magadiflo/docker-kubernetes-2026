@@ -1,0 +1,45 @@
+server:
+  port: 8001
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: user-service
+
+  # API Versioning (Spring Boot 4)
+  mvc:
+    api-version:
+      # Obliga a que todas las peticiones incluyan una versión.
+      # Si el cliente no la envía, la solicitud fallará (generalmente con un 400 Bad Request).
+      required: true
+
+      # Define qué versiones son válidas en tu aplicación.
+      # En este caso, solo aceptará peticiones marcadas como versión 1 o 2.
+      supported: 1,2
+      use:
+        # Indica que la versión se debe extraer de un segmento de la ruta (URL).
+        # El valor 0 es el índice del segmento de ruta donde se espera la versión. Por ejemplo:
+        # Para una estructura de URL como /{versión}/resource, use 0.
+        # Para una estructura de URL como /api/{versión}/resource, use 1.
+        path-segment: 1
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_user_service
+    username: admin
+    password: magadiflo
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+custom:
+  course-service:
+    base-url: http://localhost:8002/api/v1/courses
+
+logging:
+  level:
+    dev.magadiflo.user.app: debug
+    org.hibernate.SQL: debug
