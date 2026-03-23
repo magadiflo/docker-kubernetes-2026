@@ -1,5 +1,6 @@
 FROM eclipse-temurin:25-jdk-alpine
 WORKDIR /app
-COPY ./target/*.jar ./app.jar
+COPY ./ ./
+RUN sed -i -e 's/\r$//' ./mvnw && ./mvnw clean package -DskipTests
 EXPOSE 8001
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "./target/user-service-0.0.1-SNAPSHOT.jar"]
