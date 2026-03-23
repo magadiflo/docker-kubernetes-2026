@@ -1,0 +1,7 @@
+# 1. Bloqueo total: Ignora todos los archivos y directorios del contexto
+*
+# 2. Rescate selectivo: Solo estos elementos son necesarios para construir la app
+!src/
+!pom.xml
+!.mvn/
+!mvnw
