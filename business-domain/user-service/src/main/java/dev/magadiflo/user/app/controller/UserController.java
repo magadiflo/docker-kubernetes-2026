@@ -31,6 +31,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> findAllUsers() {
+        log.info("Recuperando todos los usuarios");
         return ResponseEntity.ok(this.userService.findAllUsers());
     }
 
