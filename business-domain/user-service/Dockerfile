@@ -1,4 +1,7 @@
-FROM eclipse-temurin:25-jdk-alpine AS dependencies
+ARG JDK_VERSION=25-jdk-alpine
+ARG JRE_VERSION=25-jre-alpine
+
+FROM eclipse-temurin:${JDK_VERSION} AS dependencies
 WORKDIR /app
 COPY ./mvnw ./
 COPY ./.mvn ./.mvn
@@ -7,17 +10,18 @@ RUN sed -i -e 's/\r$//' ./mvnw && ./mvnw dependency:go-offline
 COPY ./src ./src
 RUN ./mvnw clean package -DskipTests
 
-FROM eclipse-temurin:25-jre-alpine AS builder
+FROM eclipse-temurin:${JRE_VERSION} AS builder
 WORKDIR /app
 COPY --from=dependencies /app/target/*.jar ./app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
-FROM eclipse-temurin:25-jre-alpine AS runner
+FROM eclipse-temurin:${JRE_VERSION} AS runner
 WORKDIR /app
 RUN mkdir ./logs
 COPY --from=builder /app/dependencies ./
 COPY --from=builder /app/spring-boot-loader ./
 COPY --from=builder /app/snapshot-dependencies ./
 COPY --from=builder /app/application ./
-EXPOSE 8001
+ENV CONTAINER_PORT=8001
+EXPOSE ${CONTAINER_PORT}
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
