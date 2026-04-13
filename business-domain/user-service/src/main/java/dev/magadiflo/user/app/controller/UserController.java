@@ -37,7 +37,6 @@ public class UserController {
 
     @GetMapping(path = "/{userId}")
     public ResponseEntity<UserResponse> findUser(@PathVariable Long userId) {
-        log.info("Mensaje que confirma que Docker Compose reconstruyó la imagen con --build");
         log.info("Consultando el usuario con id: {}", userId);
         return ResponseEntity.ok(this.userService.findUser(userId));
     }
