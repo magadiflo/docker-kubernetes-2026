@@ -1,11 +1,13 @@
 server:
-  port: 8001
+  port: ${CONTAINER_PORT:8001}
   error:
     include-message: always
 
 spring:
   application:
     name: user-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
 
   # API Versioning (Spring Boot 4)
   mvc:
@@ -25,9 +27,9 @@ spring:
         path-segment: 1
 
   datasource:
-    url: jdbc:mysql://localhost:3306/db_user_service
-    username: admin
-    password: magadiflo
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -37,9 +39,11 @@ spring:
 
 custom:
   course-service:
-    base-url: http://localhost:8002/api/v1/courses
+    base-url: http://${COURSE_SERVICE_HOST}:${COURSE_SERVICE_PORT}/api/v1/courses
 
 logging:
   level:
     dev.magadiflo.user.app: debug
     org.hibernate.SQL: debug
+  file:
+    name: /app/logs/${spring.application.name}.log

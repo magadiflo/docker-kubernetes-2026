@@ -5,6 +5,7 @@ import dev.magadiflo.user.app.dto.UserResponse;
 import dev.magadiflo.user.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/api/{version}/users", version = "1")
@@ -29,11 +31,13 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> findAllUsers() {
+        log.info("Recuperando todos los usuarios");
         return ResponseEntity.ok(this.userService.findAllUsers());
     }
 
     @GetMapping(path = "/{userId}")
     public ResponseEntity<UserResponse> findUser(@PathVariable Long userId) {
+        log.info("Consultando el usuario con id: {}", userId);
         return ResponseEntity.ok(this.userService.findUser(userId));
     }
 
