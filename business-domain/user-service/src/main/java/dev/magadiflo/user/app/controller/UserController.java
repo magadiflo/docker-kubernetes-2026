@@ -6,6 +6,8 @@ import dev.magadiflo.user.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,16 +30,23 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final ApplicationContext context;
+
+    @GetMapping(path = "/simulate-error")
+    public void simulateError() {
+        var configurableApplicationContext = (ConfigurableApplicationContext) this.context;
+        configurableApplicationContext.close();
+    }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> findAllUsers() {
-        log.info("Recuperando todos los usuarios");
+        log.info("Solicitud recibida para obtener todos los usuarios");
         return ResponseEntity.ok(this.userService.findAllUsers());
     }
 
     @GetMapping(path = "/{userId}")
     public ResponseEntity<UserResponse> findUser(@PathVariable Long userId) {
-        log.info("Consultando el usuario con id: {}", userId);
+        log.info("Solicitud recibida para obtener usuario con id: {}", userId);
         return ResponseEntity.ok(this.userService.findUser(userId));
     }
 
