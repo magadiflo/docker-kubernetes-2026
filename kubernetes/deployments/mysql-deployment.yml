@@ -26,3 +26,8 @@ spec:
               value: admin
             - name: MYSQL_PASSWORD
               value: magadiflo
+      volumes:
+        - name: mysql-data
+          hostPath:
+            path: /var/lib/mysql
+            type: DirectoryOrCreate
