@@ -24,3 +24,11 @@ spec:
               value: postgres
             - name: POSTGRES_PASSWORD
               value: magadiflo
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      volumes:
+        - name: postgres-data
+          hostPath:
+            path: /var/lib/postgresql/data
+            type: DirectoryOrCreate
