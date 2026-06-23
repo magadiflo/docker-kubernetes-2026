@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc
+  name: pvc-postgres
 spec:
-  volumeName: mysql-pv
+  volumeName: pv-postgres
   accessModes:
     - ReadWriteOnce
   volumeMode: Filesystem
