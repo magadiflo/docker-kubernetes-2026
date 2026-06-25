@@ -19,15 +19,24 @@ spec:
             - containerPort: 5432
           env:
             - name: POSTGRES_DB
-              value: db_course_service
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-course-service
+                  key: db_name
             - name: POSTGRES_USER
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: sec-course-service
+                  key: db_username
             - name: POSTGRES_PASSWORD
-              value: magadiflo
+              valueFrom:
+                secretKeyRef:
+                  name: sec-course-service
+                  key: db_password
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: postgres-pvc
+            claimName: pvc-postgres
