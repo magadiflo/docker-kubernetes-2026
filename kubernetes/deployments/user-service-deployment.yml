@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: d-user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: d-user-service
+  template:
+    metadata:
+      labels:
+        app: d-user-service
+    spec:
+      containers:
+        - image: magadiflo/user-service:latest
+          name: c-user-service
+          ports:
+            - containerPort: 8001
+          env:
+            - name: CONTAINER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: container_port
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: db_host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: db_name
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: sec-user-service
+                  key: db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sec-user-service
+                  key: db_password
+            - name: COURSE_SERVICE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: course_service_host
+            - name: COURSE_SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: course_service_port
