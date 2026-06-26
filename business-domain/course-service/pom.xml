@@ -50,6 +50,21 @@
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
         </dependency>
+        <!-- Cliente de Kubernetes para descubrimiento de servicios -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-client</artifactId>
+        </dependency>
+        <!-- Integración con ConfigMaps y Secrets para configuración externa -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
+        </dependency>
+        <!-- Balanceador de carga basado en el cliente de Kubernetes -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-client-loadbalancer</artifactId>
+        </dependency>
         <!--/Agregado manualmente-->
         <dependency>
             <groupId>org.postgresql</groupId>
