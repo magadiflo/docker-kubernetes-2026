@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -112,5 +113,23 @@ public class UserServiceClient {
 
         log.info("Recuperación exitosa de usuarios en [user-service]: {}", users);
         return users;
+    }
+
+    /**
+     * Consume el endpoint de diagnóstico de user-service para rastrear la identidad del Pod.
+     * * @return Mapa con la lista de usuarios y metadatos del Pod que responde.
+     */
+    public Map<String, Object> getInfo() {
+        log.info("Consultando información para verificar el balanceo de carga en [user-service]");
+
+        Map<String, Object> body = this.restClient
+                .get()
+                .uri(USER_URI.concat("/info"))
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+
+        log.info("Respuesta obtenida desde [user-service]: {}", body);
+        return body;
     }
 }
