@@ -8,6 +8,13 @@ data:
   db_port: '3306'
   db_name: db_user_service
   k8s_course_service_name: svc-course-service
+  spring_profiles_active: dev
   user-service.yml: |-
     config:
-      text: Configuración desde el ConfigMap. Entorno por defecto.
+      text: Configuraciones del perfil activo [default] desde [user-service-config-map.yml]
+  user-service-dev.yml: |-
+    config:
+      text: Configuraciones del perfil activo [dev] desde [user-service-config-map.yml]
+  user-service-prod.yml: |-
+    config:
+      text: Configuraciones del perfil activo [prod] desde [user-service-config-map.yml]

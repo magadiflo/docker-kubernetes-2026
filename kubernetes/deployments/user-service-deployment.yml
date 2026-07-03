@@ -26,6 +26,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: spring_profiles_active
             - name: CONTAINER_PORT
               valueFrom:
                 configMapKeyRef:
