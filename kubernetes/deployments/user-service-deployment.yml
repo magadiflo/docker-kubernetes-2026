@@ -17,6 +17,13 @@ spec:
           name: c-user-service
           ports:
             - containerPort: 8001
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '400m'
+            limits:
+              memory: '1024Mi'
+              cpu: '1000m'
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
