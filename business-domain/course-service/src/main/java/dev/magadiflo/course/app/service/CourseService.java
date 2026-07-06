@@ -6,8 +6,11 @@ import dev.magadiflo.course.app.dto.UserRequest;
 import dev.magadiflo.course.app.dto.UserResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CourseService {
+
+    Map<String, Object> getInfo();
     /**
      * Recupera el listado de cursos.
      *

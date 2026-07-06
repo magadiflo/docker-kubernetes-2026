@@ -3,8 +3,8 @@ package dev.magadiflo.course.app.client;
 import dev.magadiflo.course.app.dto.UserRequest;
 import dev.magadiflo.course.app.dto.UserResponse;
 import dev.magadiflo.course.app.exception.RemoteUserNotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -12,14 +12,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class UserServiceClient {
 
+    private static final String USER_URI = "/api/v1/users";
     private final RestClient restClient;
+
+    public UserServiceClient(@Qualifier("userRestClient") RestClient restClient) {
+        this.restClient = restClient;
+    }
 
     /**
      * Recupera un usuario del microservicio remoto.
@@ -38,7 +43,7 @@ public class UserServiceClient {
 
         UserResponse userResponse = this.restClient
                 .get()
-                .uri("/{userId}", userId)
+                .uri(USER_URI.concat("/{userId}"), userId)
                 .exchange((clientRequest, clientResponse) -> {
                     HttpStatusCode statusCode = clientResponse.getStatusCode();
 
@@ -74,6 +79,7 @@ public class UserServiceClient {
 
         UserResponse userResponse = this.restClient
                 .post()
+                .uri(USER_URI)
                 .body(userRequest)
                 .retrieve()
                 .body(UserResponse.class);
@@ -97,15 +103,33 @@ public class UserServiceClient {
         List<UserResponse> users = this.restClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/by-ids")
+                        .path(USER_URI.concat("/by-ids"))
                         .queryParam("userIds", userIds)
                         .build())
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
                 });
-        users = Objects.nonNull(users)  ? users : List.of();
+        users = Objects.nonNull(users) ? users : List.of();
 
         log.info("Recuperación exitosa de usuarios en [user-service]: {}", users);
         return users;
+    }
+
+    /**
+     * Consume el endpoint de diagnóstico de user-service para rastrear la identidad del Pod.
+     * * @return Mapa con la lista de usuarios y metadatos del Pod que responde.
+     */
+    public Map<String, Object> getInfo() {
+        log.info("Consultando información para verificar el balanceo de carga en [user-service]");
+
+        Map<String, Object> body = this.restClient
+                .get()
+                .uri(USER_URI.concat("/info"))
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+
+        log.info("Respuesta obtenida desde [user-service]: {}", body);
+        return body;
     }
 }

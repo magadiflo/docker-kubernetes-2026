@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +34,19 @@ public class CourseServiceImpl implements CourseService {
     private final CourseUserMapper courseUserMapper;
 
     // --- 🔍 Operaciones de Consulta ---
+    @Override
+    public Map<String, Object> getInfo() {
+        // Obtenemos los datos del Pod de usuarios e inicializamos un HashMap mutable
+        Map<String, Object> info = new HashMap<>(this.userServiceClient.getInfo());
+
+        // Obtenemos de forma complementaria los cursos del propio negocio
+        List<CourseResponse> courses = this.findAllCourses(false);
+
+        // Inyectamos la información local en la respuesta unificada
+        info.put("courses", courses);
+        return info;
+    }
+
     @Override
     public List<CourseResponse> findAllCourses(boolean loadRelations) {
         return loadRelations ?
