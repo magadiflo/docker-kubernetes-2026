@@ -8,12 +8,14 @@ spring:
     name: gateway-server
   cloud:
     gateway:
-      routes:
-        - id: course-service-route
-          uri: lb://svc-course-service
-          predicates:
-            - Path=/api/v1/courses/**
-        - id: user-service-route
-          uri: lb://svc-user-service
-          predicates:
-            - Path=/api/v1/users/**
+      server:
+        webflux:
+          routes:
+            - id: course-service-route
+              uri: lb://svc-course-service
+              predicates:
+                - Path=/api/v1/courses/**
+            - id: user-service-route
+              uri: lb://svc-user-service
+              predicates:
+                - Path=/api/v1/users/**
