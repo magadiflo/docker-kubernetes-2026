@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,6 +34,18 @@ public class UserController {
 
     private final UserService userService;
     private final ApplicationContext context;
+    private final Environment environment; // Proporciona acceso a propiedades y variables de entorno
+
+    @GetMapping(path = "/info")
+    public ResponseEntity<Object> getInfo() {
+        Map<String, Object> body = Map.of(
+                "users", this.userService.findAllUsers(),
+                "POD_NAME", Objects.requireNonNull(this.environment.getProperty("MY_POD_NAME")),
+                "POD_IP", Objects.requireNonNull(this.environment.getProperty("MY_POD_IP")),
+                "config_text", Objects.requireNonNull(this.environment.getProperty("config.text"))
+        );
+        return ResponseEntity.ok(body);
+    }
 
     @GetMapping(path = "/simulate-error")
     public void simulateError() {

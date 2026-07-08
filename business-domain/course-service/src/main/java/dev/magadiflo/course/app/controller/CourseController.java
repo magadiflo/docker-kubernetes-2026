@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,6 +32,11 @@ public class CourseController {
 
     private final CourseService courseService;
     private final CourseUserService courseUserService;
+
+    @GetMapping(path = "/load-balancer-test")
+    public ResponseEntity<Map<String, Object>> loadBalancerTest() {
+        return ResponseEntity.ok(this.courseService.getInfo());
+    }
 
     @GetMapping
     public ResponseEntity<List<CourseResponse>> findAllCourses(@RequestParam(required = false, defaultValue = "false") boolean loadRelations) {

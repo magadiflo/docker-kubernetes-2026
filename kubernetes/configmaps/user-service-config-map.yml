@@ -7,5 +7,14 @@ data:
   db_host: svc-mysql
   db_port: '3306'
   db_name: db_user_service
-  course_service_host: svc-course-service
-  course_service_port: '8002'
+  k8s_course_service_name: svc-course-service
+  spring_profiles_active: dev
+  user-service.yml: |-
+    config:
+      text: Configuraciones del perfil activo [default] desde [user-service-config-map.yml]
+  user-service-dev.yml: |-
+    config:
+      text: Configuraciones del perfil activo [dev] desde [user-service-config-map.yml]
+  user-service-prod.yml: |-
+    config:
+      text: Configuraciones del perfil activo [prod] desde [user-service-config-map.yml]
