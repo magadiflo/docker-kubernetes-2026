@@ -19,4 +19,4 @@ spec:
             - containerPort: 8090
           env:
             - name: CONTAINER_PORT
-              value: 8090
+              value: '8090'

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: s-gateway-server
+  name: svc-gateway-server
 spec:
   ports:
     - port: 8090
