@@ -19,3 +19,8 @@ spring:
               uri: lb://svc-user-service
               predicates:
                 - Path=/api/v1/users/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
