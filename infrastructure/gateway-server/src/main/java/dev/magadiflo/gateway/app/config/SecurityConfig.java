@@ -27,7 +27,8 @@ public class SecurityConfig {
                 )
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
 
-                // Aplicamos nuestro convertidor personalizado al Resource Server
+                // Configuramos este microservicio como Resource Server (validará tokens JWT emitidos por el Authorization Server)
+                // y aplicamos nuestro convertidor personalizado para mapear los claims del JWT a roles/authorities de Spring Security.
                 .oauth2ResourceServer(oauth2ResourceServer ->
                         oauth2ResourceServer.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(this.jwtAuthenticationConverter()))
