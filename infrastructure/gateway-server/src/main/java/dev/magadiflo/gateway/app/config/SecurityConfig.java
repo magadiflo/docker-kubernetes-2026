@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -26,6 +27,12 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+
+                // Habilita el flujo de inicio de sesión OAuth 2.1 (Authorization Code)
+                .oauth2Login(Customizer.withDefaults())
+
+                // Habilita la infraestructura para actuar como Cliente OAuth 2.1
+                .oauth2Client(Customizer.withDefaults())
 
                 // Configuramos este microservicio como Resource Server (validará tokens JWT emitidos por el Authorization Server)
                 // y aplicamos nuestro convertidor personalizado para mapear los claims del JWT a roles/authorities de Spring Security.
