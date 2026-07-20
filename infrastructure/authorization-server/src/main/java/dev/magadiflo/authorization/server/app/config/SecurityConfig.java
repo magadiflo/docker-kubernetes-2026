@@ -101,10 +101,10 @@ public class SecurityConfig {
     /**
      * Registramos un cliente denominado gateway-client, el cual representa al
      * gateway-server actuando en su rol de Cliente OAuth2.
-     *
+     * <p>
      * Aunque físicamente se trata del mismo microservicio, conceptualmente
      * distinguimos sus dos responsabilidades:
-     *
+     * <p>
      * - OAuth2 Client
      * - Resource Server
      */
@@ -179,6 +179,7 @@ public class SecurityConfig {
 
             if (context.getTokenType().getValue().equals("id_token")) {
                 context.getClaims()
+                        .claim("roles", roles)
                         .claim("token_type", "Id Token")
                         .build();
             }
