@@ -10,6 +10,8 @@ spring:
     gateway:
       server:
         webflux:
+          default-filters:
+            - TokenRelay
           routes:
             - id: course-service-route
               uri: lb://svc-course-service
