@@ -8,7 +8,6 @@ spring:
     name: user-service
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:default}
-
   # API Versioning (Spring Boot 4)
   mvc:
     api-version:
@@ -25,7 +24,6 @@ spring:
         # Para una estructura de URL como /{versión}/resource, use 0.
         # Para una estructura de URL como /api/{versión}/resource, use 1.
         path-segment: 1
-
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
@@ -47,6 +45,11 @@ spring:
           - name: cm-user-service
   config:
     import: 'kubernetes:'
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
 
 management:
   endpoints:
