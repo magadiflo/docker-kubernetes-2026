@@ -21,8 +21,10 @@ public class SecurityConfig {
         http
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/actuator/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/v1/courses", "/api/v1/users", "/api/v1/users/info").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/v1/courses/{courseId}", "/api/v1/users/{userId}").hasAnyRole("USER", "ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/courses", "/api/v1/users/by-ids", "/api/v1/users/info").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/v1/courses/{courseId}", "/api/v1/users/{userId}").hasRole("USER")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/users").hasAnyRole("USER", "ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/courses/load-balancer-test", "/api/v1/users/simulate-error").hasRole("ADMIN")
                         .pathMatchers("/api/v1/courses/**", "/api/v1/users/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
