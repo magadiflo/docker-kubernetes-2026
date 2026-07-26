@@ -38,3 +38,9 @@ spring:
         provider:
           authorization-server-provider:
             issuer-uri: http://localhost:9000
+
+
+custom:
+  frontend:
+    angular:
+      base-url: http://localhost:4200
