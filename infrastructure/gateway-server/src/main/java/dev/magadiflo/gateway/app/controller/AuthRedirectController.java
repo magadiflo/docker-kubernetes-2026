@@ -12,8 +12,24 @@ import java.net.URI;
 @RestController
 public class AuthRedirectController {
 
+    private static final String OAUTH2_AUTHORIZATION_URI = "/oauth2/authorization/gateway-client-registration";
+
     @Value("${custom.frontend.angular.base-url}")
     private String frontendAngularBaseUrl;
+
+    /**
+     * Endpoint neutral de entrada para iniciar sesión.
+     * Angular solo conoce esta ruta, sin acoplarse al registrationId ni a detalles de OAuth2.
+     */
+    @GetMapping(path = "/login")
+    public Mono<ResponseEntity<Void>> handleLogin() {
+        return Mono.just(
+                ResponseEntity
+                        .status(HttpStatus.FOUND)
+                        .location(URI.create(OAUTH2_AUTHORIZATION_URI))
+                        .build()
+        );
+    }
 
     /**
      * Endpoint al que el authorization-server redirige luego de finalizar la sesión.
