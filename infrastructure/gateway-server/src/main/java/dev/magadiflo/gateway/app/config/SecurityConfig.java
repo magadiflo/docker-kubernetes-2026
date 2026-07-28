@@ -19,6 +19,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
+import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -36,7 +37,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain webFilterChain(ServerHttpSecurity http) {
         http
                 .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/actuator/**", "/login", "/post-logout", "/api/users/me").permitAll()
+                        .pathMatchers("/actuator/**", "/auth/login", "/post-logout", "/api/users/me").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/courses", "/api/v1/users/by-ids", "/api/v1/users/info").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/courses/{courseId}", "/api/v1/users/{userId}").hasRole("USER")
                         .pathMatchers(HttpMethod.GET, "/api/v1/users").hasAnyRole("USER", "ADMIN")
@@ -48,6 +49,10 @@ public class SecurityConfig {
 
                 // Habilita el flujo de inicio de sesión OAuth 2.1 (Authorization Code)
                 .oauth2Login(oauth2Login -> oauth2Login
+                        // 💡 Le indicamos a Spring Security que la URL de login es '/auth/login' (nuestro endpoint)
+                        // para que no genere la página HTML por defecto. Configuramos el endpoint personalizado
+                        // como loginPage oficial
+                        .loginPage("/auth/login")
                         .authenticationSuccessHandler(this.oauth2LoginSuccessHandler())
                 )
 
@@ -66,9 +71,16 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Manejador de éxito que garantiza la redirección a la SPA (Angular),
+     * anulando el guardado de rutas internas (SavedRequest).
+     */
     private ServerAuthenticationSuccessHandler oauth2LoginSuccessHandler() {
         RedirectServerAuthenticationSuccessHandler successHandler = new RedirectServerAuthenticationSuccessHandler();
-        successHandler.setLocation(URI.create(this.frontendAngularBaseUrl)); // ej: http://localhost:4200
+        // Siempre retorna el control al punto de entrada de la SPA Angular (ej: http://localhost:4200)
+        successHandler.setLocation(URI.create(this.frontendAngularBaseUrl));
+        // Desactiva la RequestCache (Saved Request) para forzar siempre la redirección a Angular
+        successHandler.setRequestCache(NoOpServerRequestCache.getInstance());
         return successHandler;
     }
 

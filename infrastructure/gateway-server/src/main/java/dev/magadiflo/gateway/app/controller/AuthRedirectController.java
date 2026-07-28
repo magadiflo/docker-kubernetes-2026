@@ -21,7 +21,7 @@ public class AuthRedirectController {
      * Endpoint neutral de entrada para iniciar sesión.
      * Angular solo conoce esta ruta, sin acoplarse al registrationId ni a detalles de OAuth2.
      */
-    @GetMapping(path = "/login")
+    @GetMapping(path = "/auth/login")
     public Mono<ResponseEntity<Void>> handleLogin() {
         return Mono.just(
                 ResponseEntity
