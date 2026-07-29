@@ -27,10 +27,14 @@ public class UserInfoController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        String username = Objects.nonNull(oidcUser.getPreferredUsername())
+                ? oidcUser.getPreferredUsername()
+                : oidcUser.getSubject();
+
         return Mono.just(ResponseEntity.ok(
                 Map.of(
                         "authenticated", true,
-                        "username", oidcUser.getPreferredUsername(),
+                        "username", username,
                         "roles", roles
                 )));
     }
