@@ -1,16 +1,18 @@
 import { computed, inject, Service, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { UserSession } from '../models/user-session.model';
+
+const UNAUTHENTICATED_SESSION: UserSession = { authenticated: false };
 
 @Service()
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly gatewayServerUrl: string = environment.gatewayServerUrl;
+  private readonly baseUrl: string = environment.gatewayServerUrl;
 
   // 🔒 Estado privado: nadie fuera de este servicio puede modificarlo directamente
-  private readonly userSession = signal<UserSession>({ authenticated: false });
+  private readonly userSession = signal<UserSession>(UNAUTHENTICATED_SESSION);
 
   // 📖 Exposición pública, de solo lectura, mediante computed signals
   readonly isAuthenticated = computed(() => this.userSession().authenticated);
@@ -20,11 +22,22 @@ export class AuthService {
   /**
    * Consulta el estado de sesión actual contra el gateway-server y actualiza el signal interno.
    * Se usa tanto al arrancar la aplicación como después de un login/logout.
+   *
+   * Importante: este método NUNCA propaga un error hacia quien lo suscribe. Si el Gateway no
+   * responde (caído, red interrumpida, etc.), se asume un estado "no autenticado" por defecto,
+   * en vez de dejar que el error se propague. Esto es crítico porque este método se usa dentro
+   * de provideAppInitializer, y un Observable que emite error ahí bloquea el arranque completo
+   * de la aplicación (pantalla en blanco).
    */
   fetchCurrentUser(): Observable<UserSession> {
-    return this.http
-      .get<UserSession>(`${this.gatewayServerUrl}/api/users/me`)
-      .pipe(tap((userSession: UserSession) => this.userSession.set(userSession)));
+    return this.http.get<UserSession>(`${this.baseUrl}/api/users/me`).pipe(
+      tap((userSession: UserSession) => this.userSession.set(userSession)),
+      catchError((error) => {
+        console.error('Error al recuperar la sesión del usuario actual:', error);
+        this.userSession.set(UNAUTHENTICATED_SESSION);
+        return of(UNAUTHENTICATED_SESSION);
+      }),
+    );
   }
 
   /**
@@ -33,7 +46,7 @@ export class AuthService {
    * correctamente al tratarse de una petición AJAX.
    */
   login(): void {
-    window.location.href = `${this.gatewayServerUrl}/auth/login`;
+    window.location.href = `${this.baseUrl}/auth/login`;
   }
 
   /**
@@ -45,7 +58,7 @@ export class AuthService {
   logout(): void {
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `${this.gatewayServerUrl}/logout`;
+    form.action = `${this.baseUrl}/logout`;
     document.body.appendChild(form);
     form.submit();
   }
