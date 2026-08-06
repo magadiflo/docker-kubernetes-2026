@@ -23,14 +23,12 @@
               <p class="card-text text-muted mb-2">
                 👥 {{ course.users.length }} usuario(s) inscrito(s)
               </p>
+            }
 
-              @if (course.users.length > 0) {
-                <ul class="list-unstyled small">
-                  @for (user of course.users; track user.id) {
-                    <li>🔸{{ user.name }}</li>
-                  }
-                </ul>
-              }
+            @if (authService.isAuthenticated()) {
+              <a [routerLink]="['/courses', course.id]" class="btn btn-sm btn-outline-primary">
+                Ver detalle
+              </a>
             }
           </div>
         </div>

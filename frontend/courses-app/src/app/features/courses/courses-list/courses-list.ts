@@ -1,16 +1,19 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { CourseService } from '../../../core/services/course.service';
 import { Course } from '../../../core/models/course.model';
+import { CourseService } from '../../../core/services/course.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-courses-list',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './courses-list.html',
   styleUrl: './courses-list.scss',
 })
 export class CoursesList implements OnInit {
   private readonly courseService = inject(CourseService);
+  protected readonly authService = inject(AuthService);
 
   // 📦 Estado local del componente, expresado con signals
   protected readonly courses = signal<Course[]>([]);

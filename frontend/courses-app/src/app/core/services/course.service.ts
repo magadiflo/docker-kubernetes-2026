@@ -19,4 +19,13 @@ export class CourseService {
     const params = new HttpParams().set('loadRelations', loadRelations);
     return this.http.get<Course[]>(this.baseUrl, { params });
   }
+
+  /**
+   * Obtiene el detalle de un curso específico.
+   * Endpoint protegido en el backend: requiere ROLE_USER como mínimo.
+   */
+  findCourse(courseId: number, loadRelations: boolean = false): Observable<Course> {
+    const params = new HttpParams().set('loadRelations', loadRelations);
+    return this.http.get<Course>(`${this.baseUrl}/${courseId}`, { params });
+  }
 }

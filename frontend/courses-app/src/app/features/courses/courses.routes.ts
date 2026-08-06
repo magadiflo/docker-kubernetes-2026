@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/guards/auth-guard';
 
 export default [
   {
@@ -8,6 +9,11 @@ export default [
       {
         path: '',
         loadComponent: () => import('./courses-list/courses-list').then((m) => m.CoursesList),
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./course-detail/course-detail').then((m) => m.CourseDetail),
+        canActivate: [authGuard],
       },
     ],
   },

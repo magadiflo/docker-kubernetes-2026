@@ -1,5 +1,5 @@
 import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
@@ -10,7 +10,11 @@ import { AuthService } from './core/services/auth.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+
+    // withComponentInputBinding() habilita que los parámetros de ruta (:id) se inyecten
+    // automáticamente como "input" en el componente, sin necesidad de leer ActivatedRoute manualmente
+    provideRouter(routes, withComponentInputBinding()),
+
     // Configuración moderna de HttpClient para Angular 22, con nuestro interceptor funcional registrado
     provideHttpClient(withInterceptors([credentialsInterceptor])),
 
