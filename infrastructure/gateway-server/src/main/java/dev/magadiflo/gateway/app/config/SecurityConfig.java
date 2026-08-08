@@ -20,6 +20,7 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -34,8 +35,18 @@ public class SecurityConfig {
     private String frontendAngularBaseUrl;
 
     @Bean
-    public SecurityWebFilterChain webFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain webFilterChain(ServerHttpSecurity http, CorsConfigurationSource source) {
         http
+                // ⚠️ IMPORTANTE: .cors(...) debe ir como el PRIMER paso de la cadena, antes de
+                // .authorizeExchange(...). Spring Security evalúa la configuración en el orden en que
+                // se declara, y necesitamos que las peticiones OPTIONS (preflight) sean reconocidas y
+                // resueltas por el mecanismo de CORS ANTES de que lleguen a evaluarse contra nuestras
+                // reglas de autorización (hasRole, authenticated, etc.). Si .cors(...) se declarara
+                // después de .authorizeExchange(...), o si CORS viviera en un filtro separado sin
+                // garantía de orden, el preflight (que nunca trae cookies ni tokens) sería rechazado
+                // por las reglas de autorización antes de recibir los headers CORS necesarios —
+                // exactamente el bloqueo que experimentamos al usar CorsWebFilter como bean aislado.
+                .cors(cors -> cors.configurationSource(source))
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/actuator/**", "/auth/login", "/post-logout", "/api/users/me").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/courses", "/api/v1/users/by-ids", "/api/v1/users/info").permitAll()

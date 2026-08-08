@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.time.Duration;
@@ -14,9 +14,14 @@ import java.util.List;
 
 /**
  * Configuración global de CORS (Cross-Origin Resource Sharing) para el API Gateway Reactivo (WebFlux).
- *
+ * <p>
  * Centraliza las políticas de acceso entre orígenes para asegurar que la aplicación Frontend (Angular)
  * pueda comunicarse libremente con el backend a través del Gateway sin ser bloqueada por el navegador.
+ * <p>
+ * Se expone como {@link CorsConfigurationSource} (y no como {@link org.springframework.web.cors.reactive.CorsWebFilter})
+ * porque este es el tipo que Spring Security espera para integrar CORS dentro de su propia cadena de
+ * seguridad, garantizando que las peticiones preflight (OPTIONS) se resuelvan antes de evaluar
+ * cualquier regla de autorización.
  */
 @Configuration
 public class CorsConfig {
@@ -25,7 +30,7 @@ public class CorsConfig {
     private String frontendAngularBaseUrl;
 
     @Bean
-    public CorsWebFilter corsWebFilter() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
 
         // Especifica el origen explícito permitido para comunicarse con este Gateway (URL de Angular).
@@ -64,6 +69,6 @@ public class CorsConfig {
         // Aplica esta configuración de CORS a todas las rutas expuestas por el Gateway
         source.registerCorsConfiguration("/**", corsConfig);
 
-        return new CorsWebFilter(source);
+        return source;
     }
 }

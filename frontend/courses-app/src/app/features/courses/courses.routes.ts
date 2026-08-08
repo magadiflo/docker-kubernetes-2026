@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../../core/guards/auth-guard';
+import { roleGuard } from '../../core/guards/role-guard';
 
 export default [
   {
@@ -10,10 +11,23 @@ export default [
         path: '',
         loadComponent: () => import('./courses-list/courses-list').then((m) => m.CoursesList),
       },
+      // ⚠️ "new" debe declararse ANTES de ":id" — ambos son un único segmento, y Angular
+      // evalúa las rutas en orden. Si ":id" fuera primero, "new" se interpretaría como
+      // un valor de :id en vez de coincidir con esta ruta literal.
+      {
+        path: 'new',
+        loadComponent: () => import('./course-form/course-form').then((m) => m.CourseForm),
+        canActivate: [authGuard, roleGuard('ADMIN')],
+      },
       {
         path: ':id',
         loadComponent: () => import('./course-detail/course-detail').then((m) => m.CourseDetail),
-        canActivate: [authGuard],
+        canActivate: [authGuard, roleGuard('USER')],
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () => import('./course-form/course-form').then((m) => m.CourseForm),
+        canActivate: [authGuard, roleGuard('ADMIN')],
       },
     ],
   },

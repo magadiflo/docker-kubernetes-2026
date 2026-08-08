@@ -16,5 +16,9 @@ export const routes: Routes = [
     path: '404',
     loadComponent: () => import('./shared/components/not-found/not-found').then((m) => m.NotFound),
   },
+  {
+    path: '403',
+    loadComponent: () => import('./shared/components/forbidden/forbidden').then((m) => m.Forbidden),
+  },
   { path: '**', redirectTo: '/404' },
 ];
