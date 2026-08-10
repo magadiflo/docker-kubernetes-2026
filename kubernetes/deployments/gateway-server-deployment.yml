@@ -19,4 +19,22 @@ spec:
             - containerPort: 8090
           env:
             - name: CONTAINER_PORT
-              value: '8090'
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-gateway-server
+                  key: container_port
+            - name: AUTHORIZATION_SERVER_ISSUER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-gateway-server
+                  key: authorization_server_issuer_uri
+            - name: ANGULAR_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-gateway-server
+                  key: angular_base_url
+            - name: GATEWAY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sec-gateway-server
+                  key: gateway_client_secret
