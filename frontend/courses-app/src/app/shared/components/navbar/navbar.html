@@ -25,6 +25,11 @@
             <a class="nav-link" routerLink="/users/new">+ Usuarios</a>
           </li>
         }
+        @if (authService.isAuthenticated()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/debug">🔍 Debug</a>
+          </li>
+        }
       </ul>
       <div class="d-flex">
         @if (authService.isAuthenticated()) {

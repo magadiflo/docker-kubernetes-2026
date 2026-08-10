@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authMatchGuard } from './core/guards/auth-guard';
+import { authGuard, authMatchGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/courses', pathMatch: 'full' },
@@ -11,6 +11,12 @@ export const routes: Routes = [
     path: 'users',
     loadChildren: () => import('./features/users/users.routes'),
     canMatch: [authMatchGuard],
+  },
+  {
+    path: 'debug',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/debug/debug-tokens/debug-tokens').then((m) => m.DebugTokens),
   },
   {
     path: '404',
