@@ -25,22 +25,22 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9000
+          issuer-uri: ${AUTHORIZATION_SERVER_ISSUER_URI:http://localhost:9000}
       client:
         registration:
           gateway-client-registration:
             provider: authorization-server-provider
             client-id: gateway-client
-            client-secret: 123456
+            client-secret: ${GATEWAY_CLIENT_SECRET:123456}
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope: openid, profile
         provider:
           authorization-server-provider:
-            issuer-uri: http://localhost:9000
+            issuer-uri: ${AUTHORIZATION_SERVER_ISSUER_URI:http://localhost:9000}
 
 
 custom:
   frontend:
     angular:
-      base-url: http://localhost:4200
+      base-url: ${ANGULAR_BASE_URL:http://localhost:4200}
