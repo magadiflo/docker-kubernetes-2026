@@ -5,9 +5,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,12 +39,16 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
+
+    private final Environment environment;
 
     @Bean
     @Order(1)
@@ -112,13 +118,28 @@ public class SecurityConfig {
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient gatewayClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("gateway-client")
-                .clientSecret("{noop}123456")
+                .clientSecret("{noop}" + this.environment.getProperty("GATEWAY_CLIENT_SECRET"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+
+                // OAuth Debugger (pruebas)
                 .redirectUri("https://oauthdebugger.com/debug")
+                // Entorno local
                 .redirectUri("http://localhost:8090/login/oauth2/code/gateway-client-registration")
+                // Kubernetes
+                .redirectUri(String.format(
+                        "%s/login/oauth2/code/gateway-client-registration",
+                        this.environment.getProperty("GATEWAY_SERVER_BASE_URL")
+                ))
+
+                // Entorno local
                 .postLogoutRedirectUri("http://localhost:8090/post-logout")
+                // Kubernetes
+                .postLogoutRedirectUri(String.format(
+                        "%s/post-logout",
+                        this.environment.getProperty("GATEWAY_SERVER_BASE_URL")
+                ))
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
@@ -159,7 +180,13 @@ public class SecurityConfig {
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+        String issuerUri = Objects.requireNonNull(
+                this.environment.getProperty("AUTHORIZATION_SERVER_ISSUER_URI")
+        );
+
+        return AuthorizationServerSettings.builder()
+                .issuer(issuerUri)
+                .build();
     }
 
     @Bean
