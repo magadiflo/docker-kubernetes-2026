@@ -89,3 +89,8 @@ spec:
                 configMapKeyRef:
                   name: cm-user-service
                   key: k8s_course_service_name
+            - name: AUTHORIZATION_SERVER_ISSUER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-user-service
+                  key: authorization_server_issuer_uri
