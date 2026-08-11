@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-authorization-server
+data:
+  gateway_server_base_url: http://svc-gateway-server:8090
+  authorization_server_issuer_uri: http://svc-authorization-server:9000
