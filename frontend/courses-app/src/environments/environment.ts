@@ -1,3 +1,3 @@
 export const environment = {
-  gatewayServerUrl: ''
+  gatewayServerUrl: (window as any).__env?.gatewayServerUrl || ''
 };

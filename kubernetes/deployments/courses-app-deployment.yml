@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: d-courses-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: d-courses-app
+  template:
+    metadata:
+      labels:
+        app: d-courses-app
+    spec:
+      containers:
+        - image: magadiflo/courses-app:latest
+          name: c-courses-app
+          ports:
+            - containerPort: 8080
+          env:
+            - name: GATEWAY_SERVER_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-courses-app
+                  key: gateway_server_base_url
