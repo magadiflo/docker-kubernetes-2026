@@ -9,4 +9,4 @@ spec:
       targetPort: 8001
   selector:
     app: d-user-service
-  type: LoadBalancer
+  type: ClusterIP
