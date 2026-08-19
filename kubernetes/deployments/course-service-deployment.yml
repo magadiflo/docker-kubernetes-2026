@@ -12,6 +12,10 @@ spec:
       labels:
         app: d-course-service
     spec:
+      hostAliases:
+        - ip: "10.98.206.248"
+          hostnames:
+            - "auth.magadiflo.local"
       containers:
         - image: magadiflo/course-service:latest
           name: c-course-service

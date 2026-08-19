@@ -12,6 +12,10 @@ spec:
       labels:
         app: d-user-service
     spec:
+      hostAliases:
+        - ip: "10.98.206.248"
+          hostnames:
+            - "auth.magadiflo.local"
       containers:
         - image: magadiflo/user-service:latest
           name: c-user-service

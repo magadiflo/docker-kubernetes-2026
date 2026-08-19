@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: cm-courses-app
 data:
-  gateway_server_base_url: http://svc-gateway-server:8090
+  gateway_server_base_url: http://gateway.magadiflo.local:8090

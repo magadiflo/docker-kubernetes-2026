@@ -4,5 +4,5 @@ metadata:
   name: cm-gateway-server
 data:
   container_port: '8090'
-  authorization_server_issuer_uri: http://svc-authorization-server:9000
-  angular_base_url: http://localhost:4200
+  authorization_server_issuer_uri: http://auth.magadiflo.local:9000
+  angular_base_url: http://courses.magadiflo.local:8080

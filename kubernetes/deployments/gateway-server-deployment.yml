@@ -12,6 +12,10 @@ spec:
       labels:
         app: d-gateway-server
     spec:
+      hostAliases:
+        - ip: "10.98.206.248"
+          hostnames:
+            - "auth.magadiflo.local"
       containers:
         - image: magadiflo/gateway-server:latest
           name: c-gateway-server
