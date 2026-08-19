@@ -1,0 +1,11 @@
+@if (routerLoading.isLoading()) {
+  <div class="route-progress-bar"></div>
+}
+
+<!-- Navbar Principal -->
+<app-navbar />
+
+<!-- Contenido de las vistas (Rutas) -->
+<main class="container mt-4">
+  <router-outlet />
+</main>

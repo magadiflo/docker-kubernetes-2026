@@ -1,0 +1,27 @@
+<a routerLink="/courses" class="btn btn-link px-0 mb-3">&larr; Volver al catálogo</a>
+
+<h2 class="mb-4">{{ isEditMode() ? 'Editar curso' : 'Nuevo curso' }}</h2>
+
+@if (errorMessage()) {
+  <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
+}
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="col-md-6">
+  <div class="mb-3">
+    <label for="name" class="form-label">Nombre del curso</label>
+    <input
+      id="name"
+      type="text"
+      class="form-control"
+      formControlName="name"
+      [class.is-invalid]="form.controls.name.invalid && form.controls.name.touched"
+    />
+    @if (form.controls.name.invalid && form.controls.name.touched) {
+      <div class="invalid-feedback">El nombre debe tener al menos 3 caracteres.</div>
+    }
+  </div>
+
+  <button type="submit" class="btn btn-primary" [disabled]="saving()">
+    {{ saving() ? 'Guardando...' : 'Guardar' }}
+  </button>
+</form>

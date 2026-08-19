@@ -9,4 +9,4 @@ spec:
       targetPort: 8002
   selector:
     app: d-course-service
-  type: LoadBalancer
+  type: ClusterIP

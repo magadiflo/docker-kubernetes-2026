@@ -1,0 +1,21 @@
+<h2 class="mb-4">🔍 Inspector de Tokens (Debug)</h2>
+
+<p class="text-muted">
+  El <code>access_token</code> dura ~5 minutos. Da clic en "Actualizar" antes y después de ese
+  tiempo para ver cómo Spring Security lo renueva automáticamente usando el
+  <code>refresh_token</code>, sin que Angular haga nada especial para lograrlo.
+</p>
+
+<button type="button" class="btn btn-primary mb-4" (click)="refresh()" [disabled]="loading()">
+  {{ loading() ? 'Consultando...' : '🔄 Actualizar' }}
+</button>
+
+@if (authorizedInfo()) {
+  <h5>📦 /authorized-info</h5>
+  <pre class="bg-dark text-light p-3 rounded">{{ authorizedInfo() | json }}</pre>
+}
+
+@if (principalInfo()) {
+  <h5 class="mt-4">👤 /principal-info</h5>
+  <pre class="bg-dark text-light p-3 rounded">{{ principalInfo() | json }}</pre>
+}

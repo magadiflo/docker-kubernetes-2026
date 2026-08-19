@@ -10,6 +10,8 @@ spring:
     gateway:
       server:
         webflux:
+          default-filters:
+            - TokenRelay
           routes:
             - id: course-service-route
               uri: lb://svc-course-service
@@ -19,3 +21,26 @@ spring:
               uri: lb://svc-user-service
               predicates:
                 - Path=/api/v1/users/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTHORIZATION_SERVER_ISSUER_URI:http://localhost:9000}
+      client:
+        registration:
+          gateway-client-registration:
+            provider: authorization-server-provider
+            client-id: gateway-client
+            client-secret: ${GATEWAY_CLIENT_SECRET:123456}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid, profile
+        provider:
+          authorization-server-provider:
+            issuer-uri: ${AUTHORIZATION_SERVER_ISSUER_URI:http://localhost:9000}
+
+
+custom:
+  frontend:
+    angular:
+      base-url: ${ANGULAR_BASE_URL:http://localhost:4200}

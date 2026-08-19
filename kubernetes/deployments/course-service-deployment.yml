@@ -12,6 +12,10 @@ spec:
       labels:
         app: d-course-service
     spec:
+      hostAliases:
+        - ip: "10.98.206.248"
+          hostnames:
+            - "auth.magadiflo.local"
       containers:
         - image: magadiflo/course-service:latest
           name: c-course-service
@@ -53,3 +57,8 @@ spec:
                 configMapKeyRef:
                   name: cm-course-service
                   key: k8s_user_service_name
+            - name: AUTHORIZATION_SERVER_ISSUER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-course-service
+                  key: authorization_server_issuer_uri
