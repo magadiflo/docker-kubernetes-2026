@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ public class CourseController {
     private final CourseService courseService;
     private final CourseUserService courseUserService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(path = "/load-balancer-test")
     public ResponseEntity<Map<String, Object>> loadBalancerTest() {
         return ResponseEntity.ok(this.courseService.getInfo());
@@ -43,12 +45,14 @@ public class CourseController {
         return ResponseEntity.ok(this.courseService.findAllCourses(loadRelations));
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping(path = "/{courseId}")
     public ResponseEntity<CourseResponse> findCourse(@PathVariable Long courseId,
                                                      @RequestParam(required = false, defaultValue = "false") boolean loadRelations) {
         return ResponseEntity.ok(this.courseService.findCourse(courseId, loadRelations));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CourseResponse> saveCourse(@Valid @RequestBody CourseRequest request) {
         CourseResponse courseResponse = this.courseService.saveCourse(request);
@@ -59,11 +63,13 @@ public class CourseController {
         return ResponseEntity.created(location).body(courseResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(path = "/{courseId}")
     public ResponseEntity<CourseResponse> updateCourse(@PathVariable Long courseId, @Valid @RequestBody CourseRequest request) {
         return ResponseEntity.ok(this.courseService.updateCourse(courseId, request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/{courseId}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId) {
         this.courseService.deleteCourse(courseId);
@@ -75,6 +81,7 @@ public class CourseController {
     /**
      * 🔗 Asigna un usuario existente en el sistema maestro a un curso local.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(path = "/{courseId}/users/{userId}")
     public ResponseEntity<UserResponse> assignExistingUserToCourse(@PathVariable Long courseId,
                                                                    @PathVariable Long userId) {
@@ -84,6 +91,7 @@ public class CourseController {
     /**
      * 🆕 Registra un nuevo usuario en el sistema maestro y lo inscribe automáticamente en un curso.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(path = "/{courseId}/users")
     public ResponseEntity<UserResponse> createUserAndAssignItToCourse(@Valid @RequestBody UserRequest userRequest,
                                                                       @PathVariable Long courseId) {
@@ -95,6 +103,7 @@ public class CourseController {
     /**
      * ✂️ Desvincula a un usuario de un curso específico.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/{courseId}/users/{userId}")
     public ResponseEntity<UserResponse> unassignUserFromACourse(@PathVariable Long courseId, @PathVariable Long userId) {
         return ResponseEntity.ok(this.courseService.unassignUserFromACourse(userId, courseId));
@@ -106,6 +115,7 @@ public class CourseController {
      * 🗑️ Endpoint de limpieza: Elimina la presencia de un usuario en tod0 el sistema de cursos.
      * Invocado por el user-service antes de una eliminación definitiva.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/users/{userId}")
     public ResponseEntity<Void> unassignUserFromAssociatedCourse(@PathVariable Long userId) {
         this.courseUserService.deleteCourseUserByUserId(userId);

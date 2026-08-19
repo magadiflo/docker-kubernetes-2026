@@ -1,0 +1,68 @@
+<a routerLink="/" class="btn btn-link px-0 mb-3">&larr; Volver al catálogo</a>
+
+@if (loading()) {
+  <div class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+} @else if (errorMessage()) {
+  <div class="alert alert-danger" role="alert">
+    {{ errorMessage() }}
+  </div>
+} @else if (course()) {
+  @if (authService.hasRole('ADMIN')) {
+    <div class="d-flex gap-2 mb-3">
+      <a [routerLink]="['/courses', id(), 'edit']" class="btn btn-sm btn-outline-secondary">
+        Editar
+      </a>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteCourse()">
+        Eliminar curso
+      </button>
+    </div>
+  }
+
+  <h2 class="mb-3">📖 {{ course()!.name }}</h2>
+
+  <h5 class="mt-4">Usuarios inscritos</h5>
+
+  @if (!course()!.users || course()!.users!.length === 0) {
+    <p class="text-muted">Este curso no tiene usuarios inscritos todavía.</p>
+  } @else {
+    <ul class="list-group">
+      @for (user of course()!.users; track user.id) {
+        <li class="list-group-item">
+          <a [routerLink]="['/users', user.id]" class="me-2">🔸 {{ user.name }}</a>
+          @if (authService.hasRole('ADMIN')) {
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="unassignUser(user.id)"
+            >
+              Desvincular
+            </button>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  @if (authService.hasRole('ADMIN')) {
+    <div class="mt-4 p-3 border rounded">
+      <h6>Asignar usuario existente</h6>
+      <div class="d-flex gap-2">
+        <form [formGroup]="form" (ngSubmit)="assignUser()">
+          <select formControlName="selectedUserId" class="form-select mb-2">
+            <option [ngValue]="null">Selecciona un usuario</option>
+
+            @for (user of assignableUsers(); track user.id) {
+              <option [ngValue]="user.id">{{ user.name }}</option>
+            }
+          </select>
+
+          <button type="submit" [disabled]="form.invalid" class="btn btn-primary">Asignar</button>
+        </form>
+      </div>
+    </div>
+  }
+}

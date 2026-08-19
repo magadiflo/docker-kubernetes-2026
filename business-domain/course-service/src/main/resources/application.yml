@@ -29,6 +29,11 @@ spring:
         enable-api: true
       discovery:
         all-namespaces: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTHORIZATION_SERVER_ISSUER_URI:http://localhost:9000}
 
 custom:
   user-service:

@@ -1,0 +1,16 @@
+.route-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, #0d6efd, transparent);
+    background-size: 200% 100%;
+    animation: route-progress 1s linear infinite;
+    z-index: 2000;
+}
+
+@keyframes route-progress {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

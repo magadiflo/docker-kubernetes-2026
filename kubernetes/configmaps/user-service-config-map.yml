@@ -8,6 +8,7 @@ data:
   db_port: '3306'
   db_name: db_user_service
   k8s_course_service_name: svc-course-service
+  authorization_server_issuer_uri: http://auth.magadiflo.local:9000
   spring_profiles_active: dev
   user-service.yml: |-
     config:

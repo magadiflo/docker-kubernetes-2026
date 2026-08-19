@@ -1,0 +1,38 @@
+<h2 class="mb-4">📚 Catálogo de Cursos</h2>
+
+@if (loading()) {
+  <div class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+} @else if (errorMessage()) {
+  <div class="alert alert-danger" role="alert">
+    {{ errorMessage() }}
+  </div>
+} @else if (courses().length === 0) {
+  <div class="alert alert-info" role="alert">No hay cursos registrados todavía.</div>
+} @else {
+  <div class="row g-3">
+    @for (course of courses(); track course.id) {
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ course.name }}</h5>
+            @if (course.users) {
+              <p class="card-text text-muted mb-2">
+                👥 {{ course.users.length }} usuario(s) inscrito(s)
+              </p>
+            }
+
+            @if (authService.isAuthenticated()) {
+              <a [routerLink]="['/courses', course.id]" class="btn btn-sm btn-outline-primary">
+                Ver detalle
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

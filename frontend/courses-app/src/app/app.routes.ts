@@ -1,0 +1,30 @@
+import { Routes } from '@angular/router';
+import { authGuard, authMatchGuard } from './core/guards/auth-guard';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/courses', pathMatch: 'full' },
+  {
+    path: 'courses',
+    loadChildren: () => import('./features/courses/courses.routes'),
+  },
+  {
+    path: 'users',
+    loadChildren: () => import('./features/users/users.routes'),
+    canMatch: [authMatchGuard],
+  },
+  {
+    path: 'debug',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/debug/debug-tokens/debug-tokens').then((m) => m.DebugTokens),
+  },
+  {
+    path: '404',
+    loadComponent: () => import('./shared/components/not-found/not-found').then((m) => m.NotFound),
+  },
+  {
+    path: '403',
+    loadComponent: () => import('./shared/components/forbidden/forbidden').then((m) => m.Forbidden),
+  },
+  { path: '**', redirectTo: '/404' },
+];

@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,24 +48,28 @@ public class UserController {
         return ResponseEntity.ok(body);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(path = "/simulate-error")
     public void simulateError() {
         var configurableApplicationContext = (ConfigurableApplicationContext) this.context;
         configurableApplicationContext.close();
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponse>> findAllUsers() {
         log.info("Solicitud recibida para obtener todos los usuarios");
         return ResponseEntity.ok(this.userService.findAllUsers());
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping(path = "/{userId}")
     public ResponseEntity<UserResponse> findUser(@PathVariable Long userId) {
         log.info("Solicitud recibida para obtener usuario con id: {}", userId);
         return ResponseEntity.ok(this.userService.findUser(userId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody UserRequest userRequest) {
         UserResponse userResponse = this.userService.saveUser(userRequest);
@@ -75,11 +80,13 @@ public class UserController {
         return ResponseEntity.created(location).body(userResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(path = "/{userId}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @Valid @RequestBody UserRequest userRequest) {
         return ResponseEntity.ok(this.userService.updateUser(userId, userRequest));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         this.userService.deleteUser(userId);
